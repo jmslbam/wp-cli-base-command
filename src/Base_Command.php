@@ -26,8 +26,6 @@ class Base_Command extends \WP_CLI_Command {
         if ( ! defined( 'WP_POST_REVISIONS' ) ) {
             define( 'WP_POST_REVISIONS', 0 );
         }
-
-        $this->disable_hooks();
     }
 
     /**
