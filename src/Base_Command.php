@@ -9,7 +9,6 @@ use WP_CLI_Command;
  */
 class Base_Command extends \WP_CLI_Command {
 
-
     /**
      * Mimimize the load while importing.
      *

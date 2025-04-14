@@ -26,3 +26,54 @@ class Import extends Base_Command {
     }
 }
 ```
+
+3. Use Bulk taks helper
+
+```php
+<?php
+namespace JMSLBAM;
+
+use JMSLBAM\WP_CLI\Base_Command;
+use JMSLBAM\WP_CLI\Bulk_Task;
+
+class Test extends Base_Command {
+
+	use Bulk_Task;
+
+	function run( $args, $assoc_args ) {
+
+		// $assoc_args['post_type'] = 'post';
+		$result = $this->loop_posts( $assoc_args, [ $this, 'do_something' ] );
+	}
+
+	private function do_something( $post_id, $assoc_args = [] ) {
+
+		$post = get_post( $post_id );
+
+        $post->post_title = $post->post_title . ' x';
+
+		\WP_CLI::line($post_id . '. ' . $post->post_title . ' (' . $post->ID . ')' );
+
+		\wp_update_post( $post ); // re-save post
+	}
+}
+```
+
+```php
+if( defined('WP_CLI') ) {
+	\WP_CLI::add_command( 'test', 'JMSLBAM\\Test' );
+}
+```
+
+Example command output:
+
+```bash
+➜  wp test run --post_type=product
+50. Heavy Duty Silk Gloves x (50)
+49. Durable Rubber Bench x (49)
+17. WordCamp x (17)
+3 items processed.
+```
+
+Other posiblities:
+```
