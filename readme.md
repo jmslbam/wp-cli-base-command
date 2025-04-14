@@ -76,4 +76,9 @@ Example command output:
 ```
 
 Other posiblities:
+
+```bash
+wp test run --post_type=accommodation --taxonomy=region --term=france
 ```
+
+Or any other `WP_Query` argument
