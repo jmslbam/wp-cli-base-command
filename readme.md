@@ -50,7 +50,7 @@ class Test extends Base_Command {
 
 		$post = get_post( $post_id );
 
-        $post->post_title = $post->post_title . ' x';
+        	$post->post_title = $post->post_title . ' x';
 
 		\WP_CLI::line($post_id . '. ' . $post->post_title . ' (' . $post->ID . ')' );
 
