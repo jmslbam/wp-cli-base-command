@@ -1,8 +1,8 @@
 # Usage
 
-1. Install via `composer require jmslbam/wp-cli-base-command`.
+Install via `composer require jmslbam/wp-cli-base-command`.
 
-2. Extend your own command:
+# Extend your own command:
 
 ```php
 <?php
@@ -27,7 +27,8 @@ class Import extends Base_Command {
 }
 ```
 
-3. Use Bulk taks helper
+# Use Bulk task helper
+Use the Bulk_Task to easily loop over all kind of CPT's and preform a task on it.
 
 ```php
 <?php
