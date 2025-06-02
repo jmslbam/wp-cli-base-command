@@ -2,7 +2,10 @@
     "name": "jmslbam/wp-cli-base-command",
     "description": "A base command for WP-CLI",
     "keywords": [
-        "WP-CLI", "command", "memory", "terminal"
+        "WP-CLI",
+        "command",
+        "memory",
+        "terminal"
     ],
     "homepage": "https://jaimemartinez.nl/open-source/wp-cli-base-command/",
     "license": "GPL-2.0-or-later",
@@ -21,6 +24,8 @@
         "source": "https://github.com/jmslbam/wp-cli-base-command"
     },
     "autoload": {
-        "psr-4": { "JMSLBAM\\WP_CLI\\": "src/" }
+        "psr-4": {
+            "JMSLBAM\\WP_CLI\\": "src/"
+        }
     }
 }

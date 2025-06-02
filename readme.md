@@ -39,30 +39,30 @@ use JMSLBAM\WP_CLI\Bulk_Task;
 
 class Test extends Base_Command {
 
-	use Bulk_Task;
+    use Bulk_Task;
 
-	function run( $args, $assoc_args ) {
+    function run( $args, $assoc_args ) {
 
-		// $assoc_args['post_type'] = 'post';
-		$result = $this->loop_posts( $assoc_args, [ $this, 'do_something' ] );
-	}
+        // $assoc_args['post_type'] = 'post';
+        $result = $this->loop_posts( $assoc_args, [ $this, 'do_something' ] );
+    }
 
-	private function do_something( $post_id, $assoc_args = [] ) {
+    private function do_something( $post_id, $assoc_args = [] ) {
 
-		$post = get_post( $post_id );
+        $post = get_post( $post_id );
 
-        	$post->post_title = $post->post_title . ' x';
+            $post->post_title = $post->post_title . ' x';
 
-		\WP_CLI::line($post_id . '. ' . $post->post_title . ' (' . $post->ID . ')' );
+        \WP_CLI::line($post_id . '. ' . $post->post_title . ' (' . $post->ID . ')' );
 
-		\wp_update_post( $post ); // re-save post
-	}
+        \wp_update_post( $post ); // re-save post
+    }
 }
 ```
 
 ```php
-if( defined('WP_CLI') ) {
-	\WP_CLI::add_command( 'test', 'JMSLBAM\\Test' );
+if ( defined('WP_CLI') ) {
+    \WP_CLI::add_command( 'test', 'JMSLBAM\\Test' );
 }
 ```
 
