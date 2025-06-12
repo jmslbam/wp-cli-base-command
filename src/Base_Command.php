@@ -10,12 +10,11 @@ use WP_CLI_Command;
 class Base_Command extends \WP_CLI_Command {
 
     /**
-     * Mimimize the load while importing.
+     * Minimize the load while importing.
      *
      * If you don't want this maxed out, then overwrite it in your own Command.
      */
     public function __construct() {
-
         // Ensure only the minimum of extra actions are fired.
         if ( ! defined( 'WP_IMPORTING' ) ) {
             define( 'WP_IMPORTING', true );
@@ -29,10 +28,9 @@ class Base_Command extends \WP_CLI_Command {
 
     /**
      * Disable hooks that you don't want to run while running inserts of updates.
-     * Run these hooks from their own individuel commands.
+     * Run these hooks from their own individual commands.
      */
     protected function disable_hooks(): void {
-
         // SearchWP: Stop the SearchWP indexer process
         add_filter( 'searchwp\index\process\enabled', '__return_false' );
 
@@ -66,13 +64,13 @@ class Base_Command extends \WP_CLI_Command {
     }
 
     /**
-	 *	Resets some values to reduce memory footprint.
+     * Resets some values to reduce memory footprint.
      */
     protected function free_up_memory(): void {
         $this->clear_db_query_log();
         $this->clear_actions_log();
         $this->clear_local_object_cache();
-		$this->clear_get_term_metadata();
+        $this->clear_get_term_metadata();
     }
 
     /**
@@ -107,22 +105,22 @@ class Base_Command extends \WP_CLI_Command {
      *
      * @props https://github.com/wp-cli/wp-cli/blob/master/php/utils-wp.php, https://github.com/Automattic/vip-go-mu-plugins/blob/develop/vip-helpers/vip-wp-cli.php and https://github.com/10up/ElasticPress/blob/0a7feb5c96d4dd5f5a416731742b346fb1880f8c/includes/classes/IndexHelper.php#L1200
      *
-     * But beware, because VIP remove the clearing of the memcached, probaly because that's just to heavy?
+     * But beware, because VIP remove the clearing of the memcached, probably because that's just to heavy?
      */
     protected function clear_local_object_cache(): void {
         global $wp_object_cache;
 
-		if ( function_exists( 'wp_cache_flush_runtime' ) ) {
-			wp_cache_flush_runtime();
-		} else {
-			/*
-			 * In the case where we're not using an external object cache, we need to call flush on the default
-			 * WordPress object cache class to clear the values from the cache property
-			 */
-			if ( ! wp_using_ext_object_cache() ) {
-				wp_cache_flush();
-			}
-		}
+        if ( function_exists( 'wp_cache_flush_runtime' ) ) {
+            wp_cache_flush_runtime();
+        } else {
+            /*
+             * In the case where we're not using an external object cache, we need to call flush on the default
+             * WordPress object cache class to clear the values from the cache property
+             */
+            if ( ! wp_using_ext_object_cache() ) {
+                wp_cache_flush();
+            }
+        }
 
         if ( ! is_object( $wp_object_cache ) ) {
             return;
@@ -147,30 +145,30 @@ class Base_Command extends \WP_CLI_Command {
         }
 
         // Make sure this is a public property, before trying to clear it.
-		try {
-			$cache_property = new \ReflectionProperty( $wp_object_cache, 'cache' );
-			if ( $cache_property->isPublic() ) {
-				$wp_object_cache->cache = [];
-			}
-			unset( $cache_property );
-		} catch ( \ReflectionException $e ) {
-			// No need to catch.
-		}
+        try {
+            $cache_property = new \ReflectionProperty( $wp_object_cache, 'cache' );
+            if ( $cache_property->isPublic() ) {
+                $wp_object_cache->cache = [];
+            }
+            unset( $cache_property );
+        } catch ( \ReflectionException $e ) {
+            // No need to catch.
+        }
 
-		if ( is_callable( $wp_object_cache, '__remoteset' ) ) {
-			call_user_func( [ $wp_object_cache, '__remoteset' ] );
-		}
+        if ( is_callable( $wp_object_cache, '__remoteset' ) ) {
+            call_user_func( [ $wp_object_cache, '__remoteset' ] );
+        }
     }
 
-	/**
-	 * It's high memory consuming as WP_Query instance holds all query results inside itself
-	 * and in theory $wp_filter will not stop growing until Out Of Memory exception occurs.
+    /**
+     * It's high memory consuming as WP_Query instance holds all query results inside itself
+     * and in theory $wp_filter will not stop growing until Out Of Memory exception occurs.
      * 
      * @props https://github.com/10up/ElasticPress/blob/0a7feb5c96d4dd5f5a416731742b346fb1880f8c/includes/classes/IndexHelper.php#L1249
-	 *
-	 * @return void
-	 */
-	protected function clear_get_term_metadata() {
-		remove_filter( 'get_term_metadata', [ wp_metadata_lazyloader(), 'lazyload_term_meta' ] );
-	}
+     *
+     * @return void
+     */
+    protected function clear_get_term_metadata() {
+        remove_filter( 'get_term_metadata', [ wp_metadata_lazyloader(), 'lazyload_term_meta' ] );
+    }
 }
