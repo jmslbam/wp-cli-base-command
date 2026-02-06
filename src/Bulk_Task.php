@@ -5,6 +5,57 @@ namespace JMSLBAM\WP_CLI;
 trait Bulk_Task {
 
     /**
+     * Loop through all your terms without it making you site crash.
+     * 
+     * Use a do while loop using $query = new WP_Term_Query(); and then $query->query( $args );
+     */
+    protected function loop_terms( array $query_args = [], $callback = false, array $callback_args = [] ) {
+
+        if ( ! \is_callable( $callback ) ) {
+            error_log( 'Loop: $callback not callable' );
+            return;
+        }
+
+        /**
+         * WP_Term_Query: Only query those which have a combination of this --taxonomy & --terms selected.
+         */
+        $query_args = $this->terms__parse_assoc_args( $query_args );
+
+        // Apply default arguments.
+        $args = wp_parse_args( $query_args, [ 'number' => 0 ] );
+
+        // Force some arguments and don't let them get overridden.
+        $args['order']                  = 'ASC';
+        $args['orderby']                = 'term_id';
+        $args['update_term_meta_cache'] = false;
+        $args['hide_empty']             = false;
+
+        $offset = 0;
+        $args['number'] = 500;
+
+        do {
+            $args['offset'] = $offset;
+            $query = new \WP_Term_Query( $args );
+
+            if ( empty( $query->terms ) ) {
+                break;
+            }
+
+            foreach ( $query->terms as $term ) {
+                call_user_func_array( $callback, array_merge( [ $term ], $callback_args ) );
+            }
+
+            $offset += $args['number'];
+
+            // Contain memory leaks
+            if ( method_exists( $this, 'free_up_memory' ) ) {
+                $this->free_up_memory();
+            }
+
+        } while ( count( $query->terms ) > 0 );
+    }
+
+    /**
      * Loop through all your posts without it making you site crash.
      *
      * Prevents you from doing a 'posts_per_page' => '-1'.
@@ -27,7 +78,7 @@ trait Bulk_Task {
         /**
          * WP_Query: Only query those which have a combination of this --taxonomy & --terms selected.
          */
-        $query_args = $this->parse_assoc_args( $query_args );
+        $query_args = $this->posts__parse_assoc_args( $query_args );
 
         // Set base value of these variables that are also being used outside of the while loop
         $offset = $total = 0;
@@ -143,7 +194,8 @@ trait Bulk_Task {
      * @param array $assoc_args
      * @return array
      */
-    protected function parse_assoc_args( $assoc_args ): array {
+    protected function posts__parse_assoc_args( $assoc_args ): array {
+
         if ( ! isset( $assoc_args['taxonomy'] ) || ! isset( $assoc_args['terms'] ) ) {
             return $assoc_args;
         }
@@ -164,6 +216,36 @@ trait Bulk_Task {
         }
 
         unset( $assoc_args['taxonomy'], $assoc_args['terms'] );
+
+        return $assoc_args;
+    }
+
+    /**
+     * Helpers function to parse --terms=snowboarding into term_ids or slugs. No need to parse --taxonomy because that's already a valid argument.
+     *
+     * @param array $assoc_args
+     * @return array
+     */
+    protected function terms__parse_assoc_args( $assoc_args ): array {
+
+        if ( ! isset( $assoc_args['terms'] ) ) {
+            return $assoc_args;
+        }
+
+        $tax_terms = explode( ',', $assoc_args['terms'] );
+
+        if ( is_array( $tax_terms ) && $tax_terms !== [] ) {
+
+            $only_integers = $this->array_contains_only_numbers( $tax_terms );
+
+            if($only_integers) {
+                $assoc_args['term_id'] = array_values($tax_terms); // id's
+            } else {
+                $assoc_args['slug'] = array_values($tax_terms); // slugs
+            }
+        }
+
+        unset( $assoc_args['terms'] );
 
         return $assoc_args;
     }
