@@ -155,9 +155,11 @@ trait Bulk_Task {
             $only_integers = $this->array_contains_only_numbers( $tax_terms );
 
             $assoc_args['tax_query'] = [
-                'taxonomy' => $assoc_args['taxonomy'],
-                'field'    => ( ( $only_integers ) ? 'id' : 'slug' ),
-                'terms'    => array_values($tax_terms),
+                [
+                    'taxonomy' => $assoc_args['taxonomy'],
+                    'field'    => ( $only_integers ? 'term_id' : 'slug' ),
+                    'terms'    => array_values( $tax_terms ),
+                ],
             ];
         }
 
