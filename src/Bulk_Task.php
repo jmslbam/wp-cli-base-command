@@ -15,7 +15,7 @@ trait Bulk_Task {
      * @var callable $callback The function to be called for each Post ID that comes from the WP_Query
      * @var array $query_args Arguments to passed to the $callback function
      */
-    public function loop_posts( array $query_args = [], $callback = false, array $callback_args = [] ) {
+    protected function loop_posts( array $query_args = [], $callback = false, array $callback_args = [] ) {
         if ( ! \is_callable( $callback ) ) {
             error_log( 'Loop: $callback not callable' );
             return;
