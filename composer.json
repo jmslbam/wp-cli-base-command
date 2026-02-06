@@ -5,7 +5,9 @@
         "WP-CLI",
         "command",
         "memory",
-        "terminal"
+        "terminal",
+        "bulk",
+        "loop"
     ],
     "homepage": "https://jaimemartinez.nl/open-source/wp-cli-base-command/",
     "license": "GPL-2.0-or-later",

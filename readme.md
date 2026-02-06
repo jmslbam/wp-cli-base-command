@@ -28,7 +28,9 @@ class Import extends Base_Command {
 ```
 
 # Use Bulk task helper
-Use the Bulk_Task to easily loop over all kind of CPT's and preform a task on it.
+Use the Bulk_Task to easily loop over all kind of CPT's or Terms and preform a task on it.
+
+We've got `$this->loop_posts()` and `$this->loop_terms()` to choose from. Below an example for looping posts:
 
 ```php
 <?php
@@ -51,7 +53,7 @@ class Test extends Base_Command {
 
         $post = get_post( $post_id );
 
-            $post->post_title = $post->post_title . ' x';
+        $post->post_title = $post->post_title . ' x';
 
         \WP_CLI::line($post_id . '. ' . $post->post_title . ' (' . $post->ID . ')' );
 
@@ -79,7 +81,7 @@ Example command output:
 Other posiblities:
 
 ```bash
-wp test run --post_type=accommodation --taxonomy=region --term=france
+wp test run --post_type=accommodation --taxonomy=region --terms=france
 ```
 
 Or any other `WP_Query` argument
