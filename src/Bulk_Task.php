@@ -51,6 +51,9 @@ trait Bulk_Task {
 
             $query_args = \wp_parse_args( $query_args, $defaults );
 
+            if( is_string($query_args['post_type']) && $query_args['post_type'] === 'attachment' ) {
+                $query_args['post_status'] = 'inherit';
+            }
             /*
              * Fixed values
              */
