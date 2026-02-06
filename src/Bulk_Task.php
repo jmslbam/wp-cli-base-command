@@ -25,7 +25,7 @@ trait Bulk_Task {
         $query_args = $this->process_csv_arguments_to_arrays( $query_args );
 
         /**
-         * WP_Query: Only query those which have a combination of this taxonomy & term selected.
+         * WP_Query: Only query those which have a combination of this --taxonomy & --terms selected.
          */
         $query_args = $this->parse_assoc_args( $query_args );
 
@@ -135,7 +135,7 @@ trait Bulk_Task {
     }
 
     /**
-     * Helpers function to parse --taxonomy=tag && --term=snowboarding
+     * Helpers function to parse --taxonomy=tag && --terms=snowboarding
      *
      * @param array $assoc_args
      * @return array
