@@ -198,16 +198,30 @@ trait Bulk_Task {
             return $assoc_args;
         }
 
+        // Extra failsafe
+        if( ! \taxonomy_exists( $assoc_args['taxonomy'] ) ) {
+            \WP_CLI::error( sprintf( 'Taxonomy %s does not exist', $assoc_args['taxonomy'] ) );
+        }
+
         $tax_terms = explode( ',', $assoc_args['terms'] );
 
         if ( is_array( $tax_terms ) && ! empty( $tax_terms ) ) {
 
             $only_integers = $this->array_contains_only_numbers( $tax_terms );
+            $tax_field = ( $only_integers ? 'term_id' : 'slug' );
+
+            // Extra fail safe
+            foreach( $tax_terms as $term ) {
+                $found_term = get_term_by( $tax_field, $term, $assoc_args['taxonomy'] );
+                if( ! $found_term ) {                  
+                    \WP_CLI::error( sprintf( 'Term %s not found in taxonomy %s', $term, $assoc_args['taxonomy'] ) );
+                }
+            }
 
             $assoc_args['tax_query'] = [
                 [
                     'taxonomy' => $assoc_args['taxonomy'],
-                    'field'    => ( $only_integers ? 'term_id' : 'slug' ),
+                    'field'    => $tax_field,
                     'terms'    => array_values( $tax_terms ),
                 ],
             ];
