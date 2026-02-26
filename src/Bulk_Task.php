@@ -42,7 +42,7 @@ trait Bulk_Task {
             }
 
             foreach ( $query->terms as $term ) {
-                call_user_func_array( $callback, array_merge( [ $term ], $callback_args ) );
+                call_user_func_array( $callback, [ $term, $callback_args ] );
             }
 
             $offset += $args['number'];
@@ -98,6 +98,7 @@ trait Bulk_Task {
                 'fields'                 => 'ids',
                 'update_post_term_cache' => false, // useful when taxonomy terms will not be utilized.
                 'update_post_meta_cache' => false, // useful when post meta will not be utilized.
+                'suppress_filters'       => true, // don't want a random `pre_get_posts` get in our way, but if you really want, the disable it!
             ];
 
             $query_args = \wp_parse_args( $query_args, $defaults );
@@ -114,9 +115,6 @@ trait Bulk_Task {
 
             // In rare situations (possibly WP-CLI commands)
             $query_args['cache_results'] = false;
-
-            // Don't want a random `pre_get_posts` get in our way
-            $query_args['suppress_filters'] = true; 
 
             // Force to false so we can skip SQL_CALC_FOUND_ROWS for performance (no pagination).
             $query_args['no_found_rows'] = false;
@@ -200,16 +198,30 @@ trait Bulk_Task {
             return $assoc_args;
         }
 
+        // Extra failsafe
+        if( ! \taxonomy_exists( $assoc_args['taxonomy'] ) ) {
+            \WP_CLI::error( sprintf( 'Taxonomy %s does not exist', $assoc_args['taxonomy'] ) );
+        }
+
         $tax_terms = explode( ',', $assoc_args['terms'] );
 
         if ( is_array( $tax_terms ) && ! empty( $tax_terms ) ) {
 
             $only_integers = $this->array_contains_only_numbers( $tax_terms );
+            $tax_field = ( $only_integers ? 'term_id' : 'slug' );
+
+            // Extra fail safe
+            foreach( $tax_terms as $term ) {
+                $found_term = get_term_by( $tax_field, $term, $assoc_args['taxonomy'] );
+                if( ! $found_term ) {                  
+                    \WP_CLI::error( sprintf( 'Term %s not found in taxonomy %s', $term, $assoc_args['taxonomy'] ) );
+                }
+            }
 
             $assoc_args['tax_query'] = [
                 [
                     'taxonomy' => $assoc_args['taxonomy'],
-                    'field'    => ( $only_integers ? 'term_id' : 'slug' ),
+                    'field'    => $tax_field,
                     'terms'    => array_values( $tax_terms ),
                 ],
             ];
@@ -221,7 +233,7 @@ trait Bulk_Task {
     }
 
     /**
-     * Helpers function to parse --terms=snowboarding into term_ids or slugs. No need to parse --taxonomy because that's already a valid argument.
+     * Helpers function to parse --terms=snowboarding into term_ids or slugs
      *
      * @param array $assoc_args
      * @return array
