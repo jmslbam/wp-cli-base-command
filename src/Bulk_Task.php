@@ -219,7 +219,7 @@ trait Bulk_Task {
     }
 
     /**
-     * Helpers function to parse --terms=snowboarding into term_ids or slugs. No need to parse --taxonomy because that's already a valid argument.
+     * Helpers function to parse --terms=snowboarding into term_ids or slugs
      *
      * @param array $assoc_args
      * @return array
