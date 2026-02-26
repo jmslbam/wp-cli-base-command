@@ -42,7 +42,7 @@ trait Bulk_Task {
             }
 
             foreach ( $query->terms as $term ) {
-                call_user_func_array( $callback, array_merge( [ $term ], $callback_args ) );
+                call_user_func_array( $callback, [ $term, $callback_args ] );
             }
 
             $offset += $args['number'];
