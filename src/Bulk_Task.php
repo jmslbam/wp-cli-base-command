@@ -98,6 +98,7 @@ trait Bulk_Task {
                 'fields'                 => 'ids',
                 'update_post_term_cache' => false, // useful when taxonomy terms will not be utilized.
                 'update_post_meta_cache' => false, // useful when post meta will not be utilized.
+                'suppress_filters'       => true, // don't want a random `pre_get_posts` get in our way, but if you really want, the disable it!
             ];
 
             $query_args = \wp_parse_args( $query_args, $defaults );
@@ -114,9 +115,6 @@ trait Bulk_Task {
 
             // In rare situations (possibly WP-CLI commands)
             $query_args['cache_results'] = false;
-
-            // Don't want a random `pre_get_posts` get in our way
-            $query_args['suppress_filters'] = true; 
 
             // Force to false so we can skip SQL_CALC_FOUND_ROWS for performance (no pagination).
             $query_args['no_found_rows'] = false;
