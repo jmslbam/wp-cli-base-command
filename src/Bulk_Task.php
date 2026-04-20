@@ -81,7 +81,12 @@ trait Bulk_Task {
         $query_args = $this->posts__parse_assoc_args( $query_args );
 
         // Set base value of these variables that are also being used outside of the while loop
-        $offset = $total = 0;
+        $offset = 0;
+        if( isset( $query_args['offset'] ) ) {
+            $offset = $query_args['offset'];
+        }
+        
+        $total = 0;
 
         do {
             /**
